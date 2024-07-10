@@ -44,6 +44,17 @@ app.get('/api/test-history/:email', (req, res) => {
     }
   });
 });
+app.get('/api/high-score/:email', (req, res) => {
+  const { email } = req.params;
+  const sql = 'SELECT MAX(wpm) as highScore FROM test_history WHERE email = ?';
+  db.query(sql, [email], (err, results) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(200).json(results[0]);
+    }
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
