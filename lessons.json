@@ -1,0 +1,32 @@
+[
+    {
+      "id": 1,
+      "title": "Basic Typing",
+      "description": "Learn the basics of touch typing",
+      "texts": [
+        "The quick brown fox jumps over the lazy dog.",
+        "Pack my box with five dozen liquor jugs.",
+        "How vexingly quick daft zebras jump!"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Common Words",
+      "description": "Practice typing common English words",
+      "texts": [
+        "The beautiful sunset painted the sky with vibrant colors.",
+        "She quickly realized that the mysterious package was empty.",
+        "Despite the challenges, they persevered and achieved their goals."
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Code Snippets",
+      "description": "Practice typing programming code",
+      "texts": [
+        "function greet(name) { console.log(`Hello, ${name}!`); }",
+        "const numbers = [1, 2, 3, 4, 5]; const doubled = numbers.map(n => n * 2);",
+        "class Rectangle { constructor(width, height) { this.width = width; this.height = height; } }"
+      ]
+    }
+  ]
