@@ -21,10 +21,12 @@ db.connect((err) => {
   console.log('Connected to database');
 });
 
+// In your backend API file (e.g., server.js or app.js)
+
 app.post('/api/test-history', (req, res) => {
-  const { email, wpm, accuracy, mistakes, backspacesUsed } = req.body;
-  const sql = 'INSERT INTO test_history (email, wpm, accuracy, mistakes, backspaces_used, date) VALUES (?, ?, ?, ?, ?, NOW())';
-  db.query(sql, [email, wpm, accuracy, mistakes, backspacesUsed], (err, result) => {
+  const { email, wpm, accuracy, mistakes, backspacesUsed, lessonId, textId } = req.body;
+  const sql = 'INSERT INTO test_history (email, wpm, accuracy, mistakes, backspaces_used, lesson_id, text_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())';
+  db.query(sql, [email, wpm, accuracy, mistakes, backspacesUsed, lessonId, textId], (err, result) => {
     if (err) {
       res.status(500).json({ error: err.message });
     } else {
