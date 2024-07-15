@@ -1,16 +1,20 @@
+// server.js
+
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
-require('dotenv').config();
-
-
 
 const app = express();
-app.use(cors());
+
+// Middleware
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://typing-tutor-react.vercel.app/'  // Replace with your actual frontend domain
+    : 'http://localhost:3000'
+}));
 app.use(express.json());
 
-const { Pool } = require('pg');
-
+// Database connection
 const pool = new Pool({
   connectionString: process.env.POSTGRES_URL,
   ssl: {
@@ -18,6 +22,7 @@ const pool = new Pool({
   }
 });
 
+// Connect to the database
 pool.connect((err) => {
   if (err) {
     console.error('Error connecting to database', err);
@@ -26,6 +31,7 @@ pool.connect((err) => {
   }
 });
 
+// Routes
 app.post('/api/test-history', async (req, res) => {
   const { email, wpm, accuracy, mistakes, backspacesUsed, lessonId, textId } = req.body;
   const sql = 'INSERT INTO test_history (email, wpm, accuracy, mistakes, backspaces_used, lesson_id, text_id, date) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *';
@@ -59,4 +65,17 @@ app.get('/api/high-score/:email', async (req, res) => {
   }
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+// For production (Vercel)
 module.exports = app;
