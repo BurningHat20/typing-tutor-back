@@ -16,12 +16,12 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
   if (err) {
-    throw err;
+    console.error('Error connecting to the database:', err);
+    console.log('Database connection failed');
+  } else {
+    console.log('Connected to database');
   }
-  console.log('Connected to database');
 });
-
-// In your backend API file (e.g., server.js or app.js)
 
 app.post('/api/test-history', (req, res) => {
   const { email, wpm, accuracy, mistakes, backspacesUsed, lessonId, textId } = req.body;
@@ -46,6 +46,7 @@ app.get('/api/test-history/:email', (req, res) => {
     }
   });
 });
+
 app.get('/api/high-score/:email', (req, res) => {
   const { email } = req.params;
   const sql = 'SELECT MAX(wpm) as highScore FROM test_history WHERE email = ?';
