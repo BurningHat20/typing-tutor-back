@@ -7,7 +7,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://typing-tutor-back.vercel.app'], // Add your frontend's production URL here
+  origin: ['http://localhost:5173', 'https://typing-tutor-react.vercel.app'], // Add your frontend's production URL here
   credentials: true,
   optionsSuccessStatus: 200
 };
