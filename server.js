@@ -4,7 +4,15 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+
+// CORS configuration
+const corsOptions = {
+  origin: ['http://localhost:5173', 'https://typing-tutor-back.vercel.app'], // Add your frontend's production URL here
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const uri = process.env.MONGODB_URI;
@@ -73,6 +81,11 @@ app.get('/api/high-score/:email', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+// Test route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working' });
 });
 
 const PORT = process.env.PORT || 5000;
