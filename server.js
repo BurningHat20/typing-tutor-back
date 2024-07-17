@@ -21,7 +21,6 @@ db.connect((err) => {
   console.log('Connected to database');
 });
 
-// In your backend API file (e.g., server.js or app.js)
 
 app.post('/api/test-history', (req, res) => {
   const { email, wpm, accuracy, mistakes, backspacesUsed, lessonId, textId } = req.body;
