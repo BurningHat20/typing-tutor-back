@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql');
+const postgres = require('postgres');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -7,54 +7,68 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
+
+const sql = postgres({
+  host: PGHOST,
+  database: PGDATABASE,
+  username: PGUSER,
+  password: decodeURIComponent(PGPASSWORD),
+  port: 5432,
+  ssl: 'require',
+  connection: {
+    options: `project=${ENDPOINT_ID}`,
+  },
 });
 
-db.connect((err) => {
-  if (err) {
-    throw err;
+// Test the database connection
+async function testConnection() {
+  try {
+    await sql`SELECT 1`;
+    console.log('Connected to database');
+  } catch (err) {
+    console.error('Failed to connect to database:', err);
+    process.exit(1);
   }
-  console.log('Connected to database');
-});
+}
 
+testConnection();
 
-app.post('/api/test-history', (req, res) => {
+app.post('/api/test-history', async (req, res) => {
   const { email, wpm, accuracy, mistakes, backspacesUsed, lessonId, textId } = req.body;
-  const sql = 'INSERT INTO test_history (email, wpm, accuracy, mistakes, backspaces_used, lesson_id, text_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())';
-  db.query(sql, [email, wpm, accuracy, mistakes, backspacesUsed, lessonId, textId], (err, result) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.status(201).json({ message: 'Record saved successfully' });
-    }
-  });
+  try {
+    await sql`
+      INSERT INTO test_history (email, wpm, accuracy, mistakes, backspaces_used, lesson_id, text_id, date)
+      VALUES (${email}, ${wpm}, ${accuracy}, ${mistakes}, ${backspacesUsed}, ${lessonId}, ${textId}, CURRENT_TIMESTAMP)
+    `;
+    res.status(201).json({ message: 'Record saved successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.get('/api/test-history/:email', (req, res) => {
+app.get('/api/test-history/:email', async (req, res) => {
   const { email } = req.params;
-  const sql = 'SELECT * FROM test_history WHERE email = ? ORDER BY date DESC';
-  db.query(sql, [email], (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.status(200).json(results);
-    }
-  });
+  try {
+    const results = await sql`
+      SELECT * FROM test_history WHERE email = ${email} ORDER BY date DESC
+    `;
+    res.status(200).json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
-app.get('/api/high-score/:email', (req, res) => {
+
+app.get('/api/high-score/:email', async (req, res) => {
   const { email } = req.params;
-  const sql = 'SELECT MAX(wpm) as highScore FROM test_history WHERE email = ?';
-  db.query(sql, [email], (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.status(200).json(results[0]);
-    }
-  });
+  try {
+    const results = await sql`
+      SELECT MAX(wpm) as "highScore" FROM test_history WHERE email = ${email}
+    `;
+    res.status(200).json(results[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
