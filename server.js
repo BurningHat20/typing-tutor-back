@@ -7,7 +7,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: ['http://localhost:5174', 'https://your-production-frontend-url.com'],
+  origin: ['http://localhost:5174', 'https://typing-tutor-react.vercel.app.com'],
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
